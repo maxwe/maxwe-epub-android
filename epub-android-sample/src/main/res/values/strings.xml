@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">maxwe-android-project-sample</string>
+    <string name="app_name">maxwe-android-lib-sample</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_second">SecondActivity</string>
 </resources>

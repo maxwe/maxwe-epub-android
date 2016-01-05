@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">epub-android-lib</string>
+    <item name="maxwe_id_selection_indicator_start" type="id">maxwe_id_selection_indicator_start</item>
+    <item name="maxwe_id_selection_indicator_end" type="id">maxwe_id_selection_indicator_end</item>
 </resources>
