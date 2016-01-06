@@ -3,6 +3,7 @@
 buildscript {
     repositories {
         jcenter()
+        mavenLocal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
@@ -15,9 +16,14 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenLocal()
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+def buildTime() {
+    return new Date().format("yyyy-MM-dd-HH-mm", TimeZone.getTimeZone("UTC"))
 }

@@ -1,4 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+group = 'org.maxwe.epub'
+archivesBaseName = 'android-lib'
+version = '0.0.1-SNAPSHOT'
 
 android {
     compileSdkVersion 23

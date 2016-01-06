@@ -50,4 +50,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'de.greenrobot:greendao:2.1.0'
+    compile project(':epub-android-lib')
 }
