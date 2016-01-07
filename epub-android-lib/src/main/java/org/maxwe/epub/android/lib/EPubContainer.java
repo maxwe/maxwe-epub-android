@@ -14,5 +14,4 @@ public class EPubContainer extends RelativeLayout {
         super(context);
         this.addView(new EPubRender(context));
     }
-
 }

@@ -100,14 +100,14 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                  * 向右翻页
                  */
                 currentPageNum++;
-//                System.out.println("向右翻页 ======== " + i + " " + currentPageNum);
+                System.out.println("向右翻页 ======== " + i + " " + currentPageNum);
                 pageViews.get(Math.abs(i + 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() + 1);
             } else {
                 /**
                  * 向左翻页
                  */
                 currentPageNum--;
-//                System.out.println("向左翻页 ======== " + i + " " + currentPageNum);
+                System.out.println("向左翻页 ======== " + i + " " + currentPageNum);
                 pageViews.get(Math.abs(i - 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() - 1);
             }
         }
