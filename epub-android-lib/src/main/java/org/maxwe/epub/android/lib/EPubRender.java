@@ -133,9 +133,9 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         /**
          * 初始化三张页面
          */
-        this.firstPageView = new PageView(this.getContext(), "第一页");
-        this.secondPageView = new PageView(this.getContext(), "第二页");
-        this.thirdPageView = new PageView(this.getContext(), "第三页");
+        this.firstPageView = new PageView(this.getContext(), "第一页").setPageIndex(0);
+        this.secondPageView = new PageView(this.getContext(), "第二页").setPageIndex(1);
+        this.thirdPageView = new PageView(this.getContext(), "第三页").setPageIndex(2);
 
         /**
          * 初始化页面集合
@@ -145,9 +145,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         this.pageViews.add(this.thirdPageView);
 
         this.firstPageView.setOnLongClickListener(this);
-
         this.secondPageView.setOnLongClickListener(this);
-
         this.thirdPageView.setOnLongClickListener(this);
 
         this.setOnPageChangeListener(this.onPageChangeListener);

@@ -1,4 +1,4 @@
-package org.maxwe.epub.android.lib.core;
+package org.maxwe.epub.android.lib.core.view;
 
 /**
  * Created by Pengwei Ding on 2016-01-05 16:15.
