@@ -1,5 +1,7 @@
 package org.maxwe.epub.android.lib.model;
 
+import com.lidroid.xutils.db.annotation.Id;
+import com.lidroid.xutils.db.annotation.Table;
 import org.maxwe.epub.android.lib.core.model.IContent;
 
 /**
@@ -7,14 +9,27 @@ import org.maxwe.epub.android.lib.core.model.IContent;
  * Email: www.dingpengwei@foxmail.com www.dingpegnwei@gmail.com
  * Description: @TODO
  */
+@Table(name = "Content")
 public class Content implements IContent{
 
+    @Id
+    private int id;
     private String bookId;
-    private int order;
+    private int orderIndex;
     private int level;
     private String displayName;
     private String status;
     private String url;
+
+    public Content() {
+        super();
+    }
+
+    public Content(String bookId, String displayName,String url) {
+        this.bookId = bookId;
+        this.displayName = displayName;
+        this.url = url;
+    }
 
     @Override
     public String getBookId() {
@@ -22,8 +37,8 @@ public class Content implements IContent{
     }
 
     @Override
-    public int getOrder() {
-        return 0;
+    public int getOrderIndex() {
+        return this.orderIndex;
     }
 
     @Override
@@ -33,25 +48,25 @@ public class Content implements IContent{
 
     @Override
     public String getDisplayName() {
-        return null;
+        return this.displayName;
     }
 
     @Override
     public String getStatus() {
-        return null;
+        return this.status;
     }
 
     @Override
     public String getUrl() {
-        return null;
+        return this.url;
     }
 
     public void setBookId(String bookId) {
         this.bookId = bookId;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setOrderIndex(int orderIndex) {
+        this.orderIndex = orderIndex;
     }
 
     public void setLevel(int level) {
@@ -68,5 +83,13 @@ public class Content implements IContent{
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

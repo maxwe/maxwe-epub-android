@@ -1,5 +1,8 @@
 package org.maxwe.epub.android.lib.model;
 
+import com.lidroid.xutils.db.annotation.Id;
+import com.lidroid.xutils.db.annotation.Table;
+
 import org.maxwe.epub.android.lib.core.model.IBook;
 
 /**
@@ -7,8 +10,10 @@ import org.maxwe.epub.android.lib.core.model.IBook;
  * Email: www.dingpengwei@foxmail.com www.dingpegnwei@gmail.com
  * Description: @TODO
  */
+@Table(name = "EPub")
 public class EPub implements IBook{
 
+    @Id
     private String bookId;
     private String bookPath;
     private String bookDir;
@@ -20,34 +25,39 @@ public class EPub implements IBook{
 
     public EPub(){}
 
+    public EPub(String bookId,String bookPath){
+        this.bookId = bookId;
+        this.bookPath = bookPath;
+    }
+
     @Override
     public String getBookId() {
-        return null;
+        return this.bookId;
     }
 
     @Override
     public String getBookPath() {
-        return null;
+        return this.bookPath;
     }
 
     @Override
     public String getBookDir() {
-        return null;
+        return this.bookDir;
     }
 
     @Override
     public String getCoverPath() {
-        return null;
+        return this.coverPath;
     }
 
     @Override
     public String getBookName() {
-        return null;
+        return this.bookName;
     }
 
     @Override
     public String getBookVersion() {
-        return null;
+        return this.bookVersion;
     }
 
     @Override

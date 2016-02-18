@@ -51,7 +51,7 @@ public class ContentData implements IContentData {
     public List<Content> saveContents(Context context, List list) {
         DbUtils db = Data.getDB(context);
         try {
-            db.saveOrUpdateAll(list);
+            db.saveBindingIdAll(list);
         } catch (DbException e) {
             e.printStackTrace();
         } finally {

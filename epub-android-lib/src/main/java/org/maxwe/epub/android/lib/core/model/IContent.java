@@ -12,7 +12,7 @@ public interface IContent {
 
     String getBookId();
 
-    int getOrder();
+    int getOrderIndex();
     int getLevel();
 
     String getDisplayName();

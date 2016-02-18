@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!-->-->
+
+<!--</RelativeLayout>-->
+<org.maxwe.android.utils.views.tablist.Container
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00FFFF">
+
+    <org.maxwe.epub.android.lib.menu.left.TitleView
+    android:layout_width="match_parent"
+    android:layout_height="200dp">
+    </org.maxwe.epub.android.lib.menu.left.TitleView>
+
+
+    <org.maxwe.epub.android.lib.menu.left.ContentView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    </org.maxwe.epub.android.lib.menu.left.ContentView>
+
+</org.maxwe.android.utils.views.tablist.Container>
