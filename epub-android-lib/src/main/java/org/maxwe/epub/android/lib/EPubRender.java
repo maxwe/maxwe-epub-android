@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import org.maxwe.epub.android.lib.core.model.IBook;
+import org.maxwe.epub.android.lib.model.EPub;
+
 import java.util.LinkedList;
 
 /**
@@ -90,11 +93,12 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     private OnPageChangeListener onPageChangeListener = new OnPageChangeListener() {
         @Override
         public void onPageScrolled(int i, float v, int i1) {
-
+            System.out.println("onPageScrolled: " + i + "; " + v +"; " + i1);
         }
 
         @Override
         public void onPageSelected(int i) {
+            System.out.println("onPageSelected: " + i );
             if (i > currentPageNum) {
                 /**
                  * 向右翻页
@@ -114,12 +118,15 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
 
         @Override
         public void onPageScrollStateChanged(int i) {
-
+            System.out.println("onPageScrollStateChanged: " + i );
         }
     };
 
-    public EPubRender(Context context) {
+    private EPub ePub;
+    private EPubRenderConfigure ePubRenderConfigure = new EPubRenderConfigure();
+    public EPubRender(Context context,EPub ePub,EPubRenderConfigure ePubRenderConfigure) {
         super(context);
+        this.ePub = ePub;
         this.initView();
     }
 

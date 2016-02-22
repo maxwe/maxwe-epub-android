@@ -1,8 +1,8 @@
 package org.maxwe.epub.android.lib.model;
 
-import com.lidroid.xutils.db.annotation.Id;
-import com.lidroid.xutils.db.annotation.Table;
 import org.maxwe.epub.android.lib.core.model.IContent;
+import org.xutils.db.annotation.Column;
+import org.xutils.db.annotation.Table;
 
 /**
  * Created by Pengwei Ding on 2016-02-12 12:50.
@@ -12,7 +12,7 @@ import org.maxwe.epub.android.lib.core.model.IContent;
 @Table(name = "Content")
 public class Content implements IContent{
 
-    @Id
+    @Column(name = "id",isId = true)
     private int id;
     private String bookId;
     private int orderIndex;

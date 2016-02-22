@@ -2,10 +2,8 @@ package org.maxwe.epub.android.lib.menu.left;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import org.maxwe.android.utils.views.tablist.IContent;
 import org.maxwe.epub.android.lib.model.Content;
@@ -36,26 +34,15 @@ public class ContentView extends ListView implements IContent {
     }
 
     private void init() {
-//        String[] strings = {
-//                "00", "01", "02",
-//                "03", "04", "05",
-//                "06", "07", "08",
-//                "09", "10", "11",
-//                "12", "13", "14",
-//                "15", "16", "17",
-//                "18", "19", "20",
-//                "21", "22", "23",
-//                "24", "25", "26",
-//                "27", "28", "29",
-//        };
-//        this.stringArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_1, strings);
-//        this.setAdapter(this.stringArrayAdapter);
     }
 
     public void init(List<Content> contents){
-        String[] strings = new String[contents.size()];
+        String[] strings = new String[contents.size() * 2];
         for (int index =0;index<contents.size();index++){
             strings[index] = contents.get(index).getDisplayName();
+        }
+        for (int index =contents.size();index<contents.size() * 2;index++){
+            strings[index] = "占位";
         }
         this.stringArrayAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_1, strings);
         this.setAdapter(this.stringArrayAdapter);

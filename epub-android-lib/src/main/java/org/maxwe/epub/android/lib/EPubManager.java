@@ -185,6 +185,10 @@ public class EPubManager {
         return contents;
     }
 
+    public EPub getEPub(){
+        return (EPub)this.ePub;
+    }
+
 
     public interface OnEPubManageListener {
         void onBookNotExists(IBook ePub);

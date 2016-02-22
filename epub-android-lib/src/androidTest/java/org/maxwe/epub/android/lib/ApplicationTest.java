@@ -30,6 +30,11 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             }
 
             @Override
+            public void onTableContentFail(IBook ePub) {
+
+            }
+
+            @Override
             public void onSuccess(IBook ePub) {
                 System.out.println();
             }
