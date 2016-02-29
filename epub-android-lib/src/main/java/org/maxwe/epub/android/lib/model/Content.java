@@ -14,11 +14,17 @@ public class Content implements IContent{
 
     @Column(name = "id",isId = true)
     private int id;
+    @Column(name = "bookId")
     private String bookId;
+    @Column(name = "orderIndex")
     private int orderIndex;
+    @Column(name = "level")
     private int level;
+    @Column(name = "displayName")
     private String displayName;
+    @Column(name = "status")
     private String status;
+    @Column(name = "url")
     private String url;
 
     public Content() {

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "org.maxwe.epub.android.project.sample"
+        applicationId "org.maxwe.epub.android.lib.sample"
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1

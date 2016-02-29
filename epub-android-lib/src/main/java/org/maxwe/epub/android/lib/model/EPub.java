@@ -15,12 +15,19 @@ public class EPub implements IBook{
 
     @Column(name = "bookId",isId = true)
     private String bookId;
+    @Column(name = "bookPath")
     private String bookPath;
+    @Column(name = "bookDir")
     private String bookDir;
+    @Column(name = "bookName")
     private String bookName;
+    @Column(name = "coverPath")
     private String coverPath;
+    @Column(name = "bookVersion")
     private String bookVersion;
+    @Column(name = "isUnziped")
     private boolean isUnziped;
+    @Column(name = "isTableed")
     private boolean isTableed;
 
     public EPub(){}

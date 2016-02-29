@@ -8,6 +8,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import org.maxwe.epub.typesetter.core.IMeta;
+import org.maxwe.epub.typesetter.core.IParagraph;
+import org.maxwe.epub.typesetter.core.ISection;
+import org.maxwe.epub.typesetter.impl.AudioSection;
+import org.maxwe.epub.typesetter.impl.ImageSection;
+import org.maxwe.epub.typesetter.impl.Page;
+import org.maxwe.epub.typesetter.impl.TextSection;
+import org.maxwe.epub.typesetter.impl.VideoSection;
+
+import java.util.LinkedList;
+
 /**
  * Created by Pengwei Ding on 2016-01-05 17:29.
  * Email: www.dingpengwei@foxmail.com www.dingpegnwei@gmail.com
@@ -64,12 +75,36 @@ public class PageView extends FrameLayout implements View.OnClickListener, View.
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawText("第" + this.pageIndex + "页 " , 100, 100, paint);
+        canvas.drawText("第" + this.pageIndex + "页 ", 100, 100, paint);
 //        this.drawBackGroundColor(canvas, this.startX, this.startY, this.endX, this.endY);
     }
 
     public String getPageName() {
         return pageName;
+    }
+
+    public void drawPage(Page page) {
+        page.print();
+//        LinkedList<IParagraph> paragraphs = page.getParagraphs();
+//        for (IParagraph paragraph : paragraphs) {
+//            LinkedList<ISection> sections = paragraph.getSections();
+//            for (ISection section : sections) {
+//                if (section instanceof TextSection) {
+//                    LinkedList<IMeta> metas = section.getMetas();
+//                    for (IMeta meta : metas) {
+//                        int startX = meta.getStartX();
+//                        int startY = meta.getStartY();
+//                        String value = meta.getValue();
+//                    }
+//                } else if (section instanceof ImageSection) {
+//
+//                } else if (section instanceof AudioSection) {
+//
+//                } else if (section instanceof VideoSection) {
+//
+//                }
+//            }
+//        }
     }
 
 

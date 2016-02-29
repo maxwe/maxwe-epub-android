@@ -11,9 +11,12 @@ import org.maxwe.epub.android.lib.core.model.IBook;
  */
 public interface IBookData<E extends IBook> {
 
-    E findBookById(Context context,String bookId);
-    E saveBook(Context context,E e);
-    E updateBook(Context context,E e);
-    E deleteBook(Context context,E e);
+    E findBookById(Context context, String bookId) throws Exception;
+
+    E saveBook(Context context, E e) throws Exception;
+
+    E updateBook(Context context, E e) throws Exception;
+
+    E deleteBook(Context context, E e) throws Exception;
 
 }

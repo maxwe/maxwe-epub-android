@@ -10,6 +10,8 @@ import org.maxwe.epub.android.lib.data.EPubData;
 import org.maxwe.epub.android.lib.model.Content;
 import org.maxwe.epub.android.lib.model.EPub;
 import org.maxwe.epub.android.lib.util.FileUtils;
+import org.maxwe.epub.android.lib.util.MyLog;
+import org.maxwe.epub.android.lib.util.Timer;
 import org.maxwe.epub.parser.EPubParser;
 import org.maxwe.epub.parser.core.INavigation;
 
@@ -37,11 +39,6 @@ public class EPubManager {
         }
 
         @Override
-        public void onMakeEPubDirFail(IBook ePub) {
-
-        }
-
-        @Override
         public void onUnzipEPubError(IBook ePub, Exception exception) {
 
         }
@@ -58,6 +55,9 @@ public class EPubManager {
     };
 
     public EPubManager(Context context, EPub ePub, OnEPubManageListener onEPubManageListener) {
+        this.context = context;
+        this.ePub = ePub;
+
         /**
          * 确保OnEPubManageListener不为空
          * 减少后续代码对确保OnEPubManageListener对象的非空判断
@@ -65,20 +65,30 @@ public class EPubManager {
         if (onEPubManageListener != null) {
             this.onEPubManageListener = onEPubManageListener;
         }
+    }
 
-        if (!new File(ePub.getBookPath()).exists()) {
-            this.onEPubManageListener.onBookNotExists(ePub);
-            return;
+    public EPubManager manage() {
+        MyLog.addLogAccess(this.getClass());
+        Timer.configureStart = System.currentTimeMillis();
+        if (!new File(this.ePub.getBookPath()).exists()) {
+            this.onEPubManageListener.onBookNotExists(this.ePub);
+            return this;
         }
 
-        this.context = context;
-        this.ePub = this.iBookData.findBookById(context, ePub.getBookId());
-        if (this.ePub == null) {
-            /**
-             * 新书
-             * 数据库中没有这本书的信息
-             */
-            this.ePub = this.iBookData.saveBook(context, ePub);
+        IBook bookById = null;
+        try {
+            bookById = this.iBookData.findBookById(this.context, this.ePub.getBookId());
+            if (bookById != null) {
+                this.ePub = bookById;
+            } else {
+                /**
+                 * 新书
+                 * 数据库中没有这本书的信息
+                 */
+                this.iBookData.saveBook(context, this.ePub);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (!this.ePub.isUnziped() || this.ePub.getBookDir() == null || !new File(this.ePub.getBookDir()).exists()) {
@@ -86,35 +96,52 @@ public class EPubManager {
              * 没有解压或者解压后的文件被删除了
              * 解压操作
              */
-            if (this.unzip()) {
-                /**
-                 * 解压完成后保存
-                 */
-                ((EPub) this.ePub).setIsUnziped(true);
+            try {
+                this.ePub = this.unzip((EPub) this.ePub);
+            } catch (Exception e) {
+                this.onEPubManageListener.onUnzipEPubError(this.ePub, e);
+                return this;
+            }
+            /**
+             * 解压完成后保存
+             */
+            try {
                 this.iBookData.saveBook(context, this.ePub);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
-        if (!this.ePub.isTableed()) {
+        if (this.ePub.isUnziped() && !this.ePub.isTableed()) {
             /**
              * 没有配置目录
              * 配置目录操作
              */
             List<Content> contents = this.tableContents();
             if (contents == null) {
+                ((EPub) this.ePub).setIsTableed(false);
                 this.onEPubManageListener.onTableContentFail(this.ePub);
-                return;
+                return this;
             } else {
                 /**
-                 * 配置成功后保存
+                 * 配置成功后保存目录
                  */
                 this.iContentData.saveContents(context, contents);
                 ((EPub) this.ePub).setIsTableed(true);
-                this.iBookData.saveBook(context, this.ePub);
+                /**
+                 * 配置完成后保存图书
+                 */
+                try {
+                    this.iBookData.saveBook(context, this.ePub);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-
         this.onEPubManageListener.onSuccess(this.ePub);
+        Timer.configureEnd = System.currentTimeMillis();
+        MyLog.print(this.getClass(),"图书配置结束：" + (Timer.configureEnd - Timer.configureStart));
+        return this;
     }
 
 
@@ -139,26 +166,21 @@ public class EPubManager {
     /**
      * 解压到EPub同级目录下使用ID命名的文件夹下
      */
-    private boolean unzip() {
-        String targetDirPath = this.ePub.getBookPath().substring(0, this.ePub.getBookPath().lastIndexOf(File.separator)) + File.separator + this.ePub.getBookId();
+    private EPub unzip(EPub ePub) throws Exception {
+        String targetDirPath = ePub.getBookPath().substring(0, ePub.getBookPath().lastIndexOf(File.separator)) + File.separator + ePub.getBookId();
         if (!new File(targetDirPath).exists()) {
             boolean mkdirs = new File(targetDirPath).mkdirs();
             if (!mkdirs) {
-                this.onEPubManageListener.onMakeEPubDirFail(this.ePub);
-                return false;
+                throw new Exception("创建解压根目录错误");
             }
         }
-
-        try {
-            FileUtils.UnZipFolder2(this.ePub.getBookPath(), targetDirPath);
-            ((EPub) this.ePub).setBookDir(targetDirPath);
-        } catch (Exception e) {
-            this.onEPubManageListener.onUnzipEPubError(this.ePub, e);
-            return false;
-        } finally {
-
-        }
-        return true;
+        Timer.unzipStart = System.currentTimeMillis();
+        FileUtils.unzip(ePub.getBookPath(), targetDirPath);
+        Timer.unzipEnd = System.currentTimeMillis();
+        MyLog.print(this.getClass(),this.getClass().getName() + "解压图书耗时：" + (Timer.unzipEnd - Timer.unzipStart));
+        ePub.setBookDir(targetDirPath);
+        ePub.setIsUnziped(true);
+        return ePub;
     }
 
     /**
@@ -185,15 +207,13 @@ public class EPubManager {
         return contents;
     }
 
-    public EPub getEPub(){
-        return (EPub)this.ePub;
+    public EPub getEPub() {
+        return (EPub) this.ePub;
     }
 
 
     public interface OnEPubManageListener {
         void onBookNotExists(IBook ePub);
-
-        void onMakeEPubDirFail(IBook ePub);
 
         void onUnzipEPubError(IBook ePub, Exception exception);
 

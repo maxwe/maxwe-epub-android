@@ -1,6 +1,7 @@
 package org.maxwe.epub.android.lib;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -93,38 +94,45 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     private OnPageChangeListener onPageChangeListener = new OnPageChangeListener() {
         @Override
         public void onPageScrolled(int i, float v, int i1) {
-            System.out.println("onPageScrolled: " + i + "; " + v +"; " + i1);
+            // System.out.println("onPageScrolled: " + i + "; " + v +"; " + i1);
         }
 
         @Override
         public void onPageSelected(int i) {
-            System.out.println("onPageSelected: " + i );
+            System.out.println("onPageSelected: " + i);
             if (i > currentPageNum) {
                 /**
                  * 向右翻页
                  */
                 currentPageNum++;
-                System.out.println("向右翻页 ======== " + i + " " + currentPageNum);
+                System.out.println("向右翻页 ======== 当前页码：" + i + " = " + currentPageNum + " next= " + (pageViews.get(Math.abs(i) % 3).getPageIndex() + 1));
                 pageViews.get(Math.abs(i + 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() + 1);
             } else {
                 /**
                  * 向左翻页
                  */
                 currentPageNum--;
-                System.out.println("向左翻页 ======== " + i + " " + currentPageNum);
+                System.out.println("向左翻页 ======== 当前页码：" + i + " = " + currentPageNum + " prev= " + (pageViews.get(Math.abs(i) % 3).getPageIndex() - 1));
                 pageViews.get(Math.abs(i - 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() - 1);
+
+                if (pageViews.get(Math.abs(i) % 3).getPageIndex() - 1 < 0){
+                    pageViews.get(0).setPageIndex(0);
+                    pageViews.get(1).setPageIndex(1);
+                    pageViews.get(2).setPageIndex(2);
+                }
             }
         }
 
         @Override
         public void onPageScrollStateChanged(int i) {
-            System.out.println("onPageScrollStateChanged: " + i );
+            //   System.out.println("onPageScrollStateChanged: " + i );
         }
     };
 
     private EPub ePub;
     private EPubRenderConfigure ePubRenderConfigure = new EPubRenderConfigure();
-    public EPubRender(Context context,EPub ePub,EPubRenderConfigure ePubRenderConfigure) {
+
+    public EPubRender(Context context, EPub ePub, EPubRenderConfigure ePubRenderConfigure) {
         super(context);
         this.ePub = ePub;
         this.initView();
@@ -157,6 +165,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
 
         this.setOnPageChangeListener(this.onPageChangeListener);
         this.setAdapter(this.pagerAdapter);
+        this.setCurrentItem(this.currentPageNum);
     }
 
     @Override

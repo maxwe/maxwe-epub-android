@@ -16,55 +16,25 @@ import org.xutils.ex.DbException;
 public class EPubData implements IBookData {
 
     @Override
-    public EPub findBookById(Context context, String bookId) {
-        DbManager db = Data.getDB();
-        EPub ePubInDB = null;
-        try {
-            ePubInDB = db.findById(EPub.class, bookId);
-        } catch (DbException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
-        return ePubInDB;
+    public EPub findBookById(Context context, String bookId) throws Exception {
+        return Data.getDB().findById(EPub.class, bookId);
     }
 
     @Override
-    public EPub saveBook(Context context, IBook book) {
-        DbManager db = Data.getDB();
-        try {
-            db.replace(book);
-        } catch (DbException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
+    public EPub saveBook(Context context, IBook book) throws Exception {
+        Data.getDB().replace(book);
         return (EPub)book;
     }
 
     @Override
-    public EPub updateBook(Context context, IBook book) {
-        DbManager db = Data.getDB();
-        try {
-            db.saveOrUpdate(book);
-        } catch (DbException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
+    public EPub updateBook(Context context, IBook book) throws Exception {
+        Data.getDB().saveOrUpdate(book);
         return (EPub)book;
     }
 
     @Override
-    public EPub deleteBook(Context context, IBook book) {
-        DbManager db = Data.getDB();
-        try {
-            db.delete(book);
-        } catch (DbException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
+    public EPub deleteBook(Context context, IBook book) throws Exception{
+        Data.getDB().delete(book);
         return (EPub)book;
     }
 }
