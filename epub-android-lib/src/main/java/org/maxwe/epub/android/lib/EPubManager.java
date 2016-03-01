@@ -211,7 +211,6 @@ public class EPubManager {
         return (EPub) this.ePub;
     }
 
-
     public interface OnEPubManageListener {
         void onBookNotExists(IBook ePub);
 

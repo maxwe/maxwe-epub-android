@@ -14,15 +14,21 @@ public class Timer {
 
 
     /**
-     * 后台线程配置图书
+     * 后台线程程配置图书
      */
     public static long configureStart;
     public static long configureEnd;
 
     /**
-     * 后台线解压图书
+     * 后台线程解压图书
      */
     public static long unzipStart;
     public static long unzipEnd;
 
+
+    /**
+     * 后台线程排版章节
+     */
+    public static long typesetterChapterStart;
+    public static long typesetterChapterEnd;
 }

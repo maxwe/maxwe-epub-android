@@ -3,7 +3,6 @@ package org.maxwe.epub.android.lib;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -12,6 +11,11 @@ import org.maxwe.epub.android.lib.core.view.IEPubContainer;
 import org.maxwe.epub.android.lib.model.EPub;
 import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.android.lib.util.Timer;
+import org.maxwe.epub.typesetter.core.IChapter;
+import org.maxwe.epub.typesetter.core.IPage;
+import org.maxwe.epub.typesetter.impl.Chapter;
+
+import java.util.LinkedList;
 
 /**
  * Created by Pengwei Ding on 2016-01-05 16:17.
@@ -25,14 +29,14 @@ public class EPubContainer extends RelativeLayout implements IEPubContainer {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == HANDLER_KEY_EPUB_MANAGER_FAIL) {
-                Toast.makeText(EPubContainer.this.getContext(),"错误",Toast.LENGTH_SHORT).show();
+                Toast.makeText(EPubContainer.this.getContext(), "错误", Toast.LENGTH_SHORT).show();
             } else if (msg.what == HANDLER_KEY_EPUB_MANAGER_SUCCESS) {
                 initView();
             }
         }
     };
 
-    private EPubManager.OnEPubManageListener ePubManageListener = new EPubManager.OnEPubManageListener(){
+    private EPubManager.OnEPubManageListener ePubManageListener = new EPubManager.OnEPubManageListener() {
         @Override
         public void onBookNotExists(IBook ePub) {
             Message message = new Message();
@@ -64,21 +68,51 @@ public class EPubContainer extends RelativeLayout implements IEPubContainer {
 
     private EPubManager ePubManager;
 
-    public EPubContainer(final Context context,final EPub ePub) {
+    public EPubContainer(final Context context, final EPub ePub) {
         super(context);
         MyLog.addLogAccess(this.getClass());
         Timer.initEPubContainerStart = System.currentTimeMillis();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ePubManager = new EPubManager(context, ePub, ePubManageListener).manage();
+                test();
+                ePubManager = new EPubManager(context, ePub, ePubManageListener);
+                ePubManager.manage();
             }
         }).start();
     }
 
-    private void initView(){
-       this.addView(new EPubRender(this.getContext(),this.ePubManager.getEPub(),null));
+    private void initView() {
+        this.addView(new EPubRender(this.getContext(), this.ePubManager.getEPub(), null, this.pages));
         Timer.initEPubContainerEnd = System.currentTimeMillis();
-        MyLog.print(this.getClass(),this.getClass().getName() + "初始化完成" + (Timer.initEPubContainerEnd - Timer.initEPubContainerStart));
+        MyLog.print(this.getClass(), this.getClass().getName() + "初始化完成" + (Timer.initEPubContainerEnd - Timer.initEPubContainerStart));
+    }
+
+    private LinkedList<IPage> pages;
+
+    private void test() {
+        try {
+            Timer.typesetterChapterStart = System.currentTimeMillis();
+            String path = "/sdcard/YMEPub/YMEPub/sample/OEBPS/Text/ds00216105.xhtml";
+            org.maxwe.epub.parser.core.IChapter parserChapter = new org.maxwe.epub.parser.impl.Chapter(path);
+            IChapter chapter = new Chapter(parserChapter, 100, 100, 1440 - 100, 2304 - 100).setChapterTypesetListener(new Chapter.ChapterTypesetListener() {
+                public void onChapterTypesetStart(IChapter chapter) {
+                    //System.out.println("章节：《" + chapter.getChapterName() + "》排版开始");
+                }
+
+                public void onPageTypesetOver(IChapter chapter, int indexInChapter) {
+                    //System.out.println("章节：《" + chapter.getChapterName() + "》排版到第" + indexInChapter + "页");
+                }
+
+                public void onChapterTypesetEnd(IChapter chapter) {
+                    //System.out.println("章节：《" + chapter.getChapterName() + "》排版结束，共有" + chapter.getPages().size() + "页");
+                }
+            }).typeset();
+            this.pages = chapter.getPages();
+            Timer.typesetterChapterEnd = System.currentTimeMillis();
+            MyLog.print(this.getClass(), this.getClass().getName() + " 排版耗时:" + (Timer.typesetterChapterStart - Timer.typesetterChapterEnd));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

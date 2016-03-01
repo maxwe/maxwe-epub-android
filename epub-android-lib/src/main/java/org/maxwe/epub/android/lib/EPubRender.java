@@ -1,7 +1,6 @@
 package org.maxwe.epub.android.lib;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -9,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import org.maxwe.epub.android.lib.core.model.IBook;
 import org.maxwe.epub.android.lib.model.EPub;
+import org.maxwe.epub.android.lib.util.MyLog;
+import org.maxwe.epub.typesetter.core.IPage;
+import org.maxwe.epub.typesetter.impl.Page;
 
 import java.util.LinkedList;
 
@@ -35,16 +36,16 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     /**
      * 定义三张页面
      */
-    private PageView firstPageView;
-    private PageView secondPageView;
-    private PageView thirdPageView;
+    private EPubPageView firstPageView;
+    private EPubPageView secondPageView;
+    private EPubPageView thirdPageView;
 
     /**
      * 页面的集合
      * 初始化三张页面
      * 轮转式显示PageDrawer内容
      */
-    private final LinkedList<PageView> pageViews = new LinkedList<>();
+    private final LinkedList<EPubPageView> pageViews = new LinkedList<>();
     /**
      * pageView 适配器
      */
@@ -79,8 +80,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                 position = pageViews.size() + position;
             }
 
-            PageView pageView = pageViews.get(position);
-            pageView.reset();
+            EPubPageView pageView = pageViews.get(position);
             ViewParent parent = pageView.getParent();
             if (parent != null) {
                 ViewGroup viewGroup = (ViewGroup) parent;
@@ -107,6 +107,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                 currentPageNum++;
                 System.out.println("向右翻页 ======== 当前页码：" + i + " = " + currentPageNum + " next= " + (pageViews.get(Math.abs(i) % 3).getPageIndex() + 1));
                 pageViews.get(Math.abs(i + 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() + 1);
+                pageViews.get(Math.abs(i + 1) % 3).drawPage((Page) pages.get(pageViews.get(Math.abs(i + 1) % 3).getPageIndex() >= pages.size() ? pages.size() - 1 : pageViews.get(Math.abs(i + 1) % 3).getPageIndex()));
             } else {
                 /**
                  * 向左翻页
@@ -115,11 +116,12 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                 System.out.println("向左翻页 ======== 当前页码：" + i + " = " + currentPageNum + " prev= " + (pageViews.get(Math.abs(i) % 3).getPageIndex() - 1));
                 pageViews.get(Math.abs(i - 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() - 1);
 
-                if (pageViews.get(Math.abs(i) % 3).getPageIndex() - 1 < 0){
+                if (pageViews.get(Math.abs(i) % 3).getPageIndex() - 1 < 0) {
                     pageViews.get(0).setPageIndex(0);
                     pageViews.get(1).setPageIndex(1);
                     pageViews.get(2).setPageIndex(2);
                 }
+                pageViews.get(Math.abs(i - 1) % 3).drawPage((Page) pages.get(pageViews.get(Math.abs(i - 1) % 3).getPageIndex() >= pages.size() ? pages.size() - 1 : pageViews.get(Math.abs(i - 1) % 3).getPageIndex()));
             }
         }
 
@@ -132,9 +134,11 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     private EPub ePub;
     private EPubRenderConfigure ePubRenderConfigure = new EPubRenderConfigure();
 
-    public EPubRender(Context context, EPub ePub, EPubRenderConfigure ePubRenderConfigure) {
+    public EPubRender(Context context, EPub ePub, EPubRenderConfigure ePubRenderConfigure, LinkedList<IPage> pages) {
         super(context);
+        MyLog.addLogAccess(this.getClass());
         this.ePub = ePub;
+        this.pages = pages;
         this.initView();
     }
 
@@ -148,9 +152,9 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         /**
          * 初始化三张页面
          */
-        this.firstPageView = new PageView(this.getContext(), "第一页").setPageIndex(0);
-        this.secondPageView = new PageView(this.getContext(), "第二页").setPageIndex(1);
-        this.thirdPageView = new PageView(this.getContext(), "第三页").setPageIndex(2);
+        this.firstPageView = new EPubPageView(this.getContext(), "第一页").setPageIndex(0);
+        this.secondPageView = new EPubPageView(this.getContext(), "第二页").setPageIndex(1);
+        this.thirdPageView = new EPubPageView(this.getContext(), "第三页").setPageIndex(2);
 
         /**
          * 初始化页面集合
@@ -174,9 +178,31 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+    }
+
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         this.screenWidth = MeasureSpec.getSize(widthMeasureSpec);
         this.screenHeight = MeasureSpec.getSize(heightMeasureSpec);
+        MyLog.print(this.getClass(), this.getClass().getName() + screenWidth + " = " + screenHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    private LinkedList<IPage> pages = new LinkedList<>();
+
+    public void setPages(LinkedList<IPage> pages) {
+        this.pages = pages;
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        MyLog.print(this.getClass(), this.getClass().getName() + " onLayout " + changed);
+        if (changed) {
+            this.firstPageView.drawPage((Page) pages.get(0));
+            this.secondPageView.drawPage((Page) pages.get(1));
+        }
     }
 }
