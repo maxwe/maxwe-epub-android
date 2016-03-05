@@ -7,7 +7,9 @@ import org.xutils.db.annotation.Table;
 /**
  * Created by Pengwei Ding on 2016-02-12 12:50.
  * Email: www.dingpengwei@foxmail.com www.dingpegnwei@gmail.com
- * Description: @TODO
+ * Description: 图书目录
+ * id作为数据库数据标记主键
+ * bookId作为业务逻辑主键
  */
 @Table(name = "Content")
 public class Content implements IContent{

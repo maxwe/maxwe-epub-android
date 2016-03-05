@@ -11,4 +11,7 @@ public interface IEPubContainer {
     int HANDLER_KEY_EPUB_MANAGER_FAIL = 0;
     int HANDLER_KEY_EPUB_MANAGER_SUCCESS = 1;
 
+
+    void onBackPressed() throws Exception ;
+
 }

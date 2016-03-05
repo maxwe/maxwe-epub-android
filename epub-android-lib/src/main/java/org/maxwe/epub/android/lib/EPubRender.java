@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import org.maxwe.epub.android.lib.core.model.IProgress;
 import org.maxwe.epub.android.lib.model.EPub;
 import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.typesetter.core.IPage;
@@ -49,6 +50,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     /**
      * pageView 适配器
      */
+    private EPubPageView ePubPageView;
     private final PagerAdapter pagerAdapter = new PagerAdapter() {
         @Override
         public int getCount() {
@@ -87,6 +89,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                 viewGroup.removeView(pageView);
             }
             container.addView(pageView);
+            ePubPageView = pageView;
             return pageView;
         }
     };
@@ -132,13 +135,24 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
     };
 
     private EPub ePub;
-    private EPubRenderConfigure ePubRenderConfigure = new EPubRenderConfigure();
+    private IProgress progress;
 
-    public EPubRender(Context context, EPub ePub, EPubRenderConfigure ePubRenderConfigure, LinkedList<IPage> pages) {
+    public EPubRender(Context context, EPub ePub, IProgress progress, LinkedList<IPage> pages) {
         super(context);
         MyLog.addLogAccess(this.getClass());
         this.ePub = ePub;
         this.pages = pages;
+        this.progress = progress;
+//        for (int index= 0;index<this.pages.size();index++){
+//            IPage iPage = this.pages.get(index);
+//            if (this.progress.getChapterOffset() == iPage.getChapterIndex() &&
+//                    this.progress.getParagraphOffset() == iPage.getStartParagraphIndexInChapter() &&
+//                    this.progress.getSectionOffset() == iPage.getStartSectionIndexInParagraph() &&
+//                    this.progress.getMetaOffset() == iPage.getStartMetaIndexInSection()){
+//                this.currentPageNum = index;
+//                break;
+//            }
+//        }
         this.initView();
     }
 
@@ -170,6 +184,8 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         this.setOnPageChangeListener(this.onPageChangeListener);
         this.setAdapter(this.pagerAdapter);
         this.setCurrentItem(this.currentPageNum);
+
+
     }
 
     @Override
@@ -204,5 +220,9 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
             this.firstPageView.drawPage((Page) pages.get(0));
             this.secondPageView.drawPage((Page) pages.get(1));
         }
+    }
+
+    IPage getPage(){
+        return this.ePubPageView.getPage();
     }
 }

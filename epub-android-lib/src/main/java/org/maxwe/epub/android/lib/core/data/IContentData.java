@@ -13,9 +13,9 @@ import java.util.List;
  * Description: 关于图书的目录数据库操作接口
  */
 public interface IContentData<E extends IContent> {
-    List<E> getContentsByBookId(Context context,String bookId);
-    List<E> getContentsByBookId(Context context,String bookId,int page,int limit);
-    List<E> saveContents(Context context,List<E> es);
-    List<E> updateContents(Context context,List<E> es);
-    List<E> deleteContentsByBookId(Context context,String bookId);
+    List<E> getContentsByBookId(String bookId) throws Exception;
+    List<E> getContentsByBookId(String bookId,int page,int limit) throws Exception;
+    List<E> saveContents(List<E> es) throws Exception;
+    List<E> updateContents(List<E> es) throws Exception;
+    List<E> deleteContentsByBookId(String bookId) throws Exception;
 }

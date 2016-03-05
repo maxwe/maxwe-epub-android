@@ -1,19 +1,25 @@
 package org.maxwe.epub.android.lib;
 
-import android.content.Context;
-
 import org.maxwe.epub.android.lib.core.data.IBookData;
 import org.maxwe.epub.android.lib.core.data.IContentData;
+import org.maxwe.epub.android.lib.core.data.IProgressData;
 import org.maxwe.epub.android.lib.core.model.IBook;
+import org.maxwe.epub.android.lib.core.model.IProgress;
 import org.maxwe.epub.android.lib.data.ContentData;
 import org.maxwe.epub.android.lib.data.EPubData;
+import org.maxwe.epub.android.lib.data.ProgressData;
 import org.maxwe.epub.android.lib.model.Content;
 import org.maxwe.epub.android.lib.model.EPub;
+import org.maxwe.epub.android.lib.model.Progress;
 import org.maxwe.epub.android.lib.util.FileUtils;
 import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.android.lib.util.Timer;
 import org.maxwe.epub.parser.EPubParser;
 import org.maxwe.epub.parser.core.INavigation;
+import org.maxwe.epub.typesetter.Configure;
+import org.maxwe.epub.typesetter.core.IChapter;
+import org.maxwe.epub.typesetter.core.IPage;
+import org.maxwe.epub.typesetter.impl.Chapter;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -29,9 +35,11 @@ public class EPubManager {
 
     private IBookData iBookData = new EPubData();
     private IContentData iContentData = new ContentData();
+    private IProgressData iProgressData = new ProgressData();
 
-    private Context context;
+    private String userId;
     private IBook ePub;
+
     private OnEPubManageListener onEPubManageListener = new OnEPubManageListener() {
         @Override
         public void onBookNotExists(IBook book) {
@@ -54,10 +62,9 @@ public class EPubManager {
         }
     };
 
-    public EPubManager(Context context, EPub ePub, OnEPubManageListener onEPubManageListener) {
-        this.context = context;
+    public EPubManager(String userId, EPub ePub, OnEPubManageListener onEPubManageListener) {
+        this.userId = userId;
         this.ePub = ePub;
-
         /**
          * 确保OnEPubManageListener不为空
          * 减少后续代码对确保OnEPubManageListener对象的非空判断
@@ -67,7 +74,7 @@ public class EPubManager {
         }
     }
 
-    public EPubManager manage() {
+    public EPubManager configure() {
         MyLog.addLogAccess(this.getClass());
         Timer.configureStart = System.currentTimeMillis();
         if (!new File(this.ePub.getBookPath()).exists()) {
@@ -77,7 +84,7 @@ public class EPubManager {
 
         IBook bookById = null;
         try {
-            bookById = this.iBookData.findBookById(this.context, this.ePub.getBookId());
+            bookById = this.iBookData.findBookById(this.ePub.getBookId());
             if (bookById != null) {
                 this.ePub = bookById;
             } else {
@@ -85,7 +92,7 @@ public class EPubManager {
                  * 新书
                  * 数据库中没有这本书的信息
                  */
-                this.iBookData.saveBook(context, this.ePub);
+                this.iBookData.saveBook(this.ePub);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,7 +113,7 @@ public class EPubManager {
              * 解压完成后保存
              */
             try {
-                this.iBookData.saveBook(context, this.ePub);
+                this.iBookData.saveBook(this.ePub);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -126,21 +133,28 @@ public class EPubManager {
                 /**
                  * 配置成功后保存目录
                  */
-                this.iContentData.saveContents(context, contents);
+                try {
+                    this.iContentData.saveContents(contents);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 ((EPub) this.ePub).setIsTableed(true);
                 /**
                  * 配置完成后保存图书
                  */
                 try {
-                    this.iBookData.saveBook(context, this.ePub);
+                    this.iBookData.saveBook(this.ePub);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-        this.onEPubManageListener.onSuccess(this.ePub);
         Timer.configureEnd = System.currentTimeMillis();
         MyLog.print(this.getClass(),"图书配置结束：" + (Timer.configureEnd - Timer.configureStart));
+
+
+        this.buildPages();
+        this.onEPubManageListener.onSuccess(this.ePub);
         return this;
     }
 
@@ -151,7 +165,12 @@ public class EPubManager {
      * @return
      */
     public List<Content> getContent() {
-        return iContentData.getContentsByBookId(this.context, this.ePub.getBookId());
+        try {
+            return iContentData.getContentsByBookId(this.ePub.getBookId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -160,7 +179,12 @@ public class EPubManager {
      * @return
      */
     public List<Content> getContent(int page, int limit) {
-        return iContentData.getContentsByBookId(this.context, this.ePub.getBookId(), page, limit);
+        try {
+            return iContentData.getContentsByBookId(this.ePub.getBookId(), page, limit);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -209,6 +233,57 @@ public class EPubManager {
 
     public EPub getEPub() {
         return (EPub) this.ePub;
+    }
+
+    LinkedList<IPage> pages = new LinkedList<>();
+
+    private void buildPages(){
+        pages.clear();
+        List<Content> contents = this.getContent();
+        for (int index=0;index<contents.size();index++){
+            Content content = contents.get(index);
+            try {
+                Timer.typesetterChapterStart = System.currentTimeMillis();
+                String path = content.getUrl();
+                org.maxwe.epub.parser.core.IChapter parserChapter = new org.maxwe.epub.parser.impl.Chapter(path,index);
+                Configure configure = new Configure(0, 0, 0, 0);
+                IChapter chapter = new Chapter(parserChapter,configure, 100, 100, 1440 - 100, 2304 - 100).setChapterTypesetListener(new Chapter.ChapterTypesetListener() {
+                    public void onChapterTypesetStart(IChapter chapter) {
+//                        System.out.println("章节：《" + chapter.getChapterName() + "》排版开始");
+                    }
+
+                    public void onPageTypesetOver(IChapter chapter, int indexInChapter) {
+//                        System.out.println("章节：《" + chapter.getChapterName() + "》排版到第" + indexInChapter + "页");
+                    }
+
+                    public void onChapterTypesetEnd(IChapter chapter) {
+//                        System.out.println("章节：《" + chapter.getChapterName() + "》排版结束，共有" + chapter.getPages().size() + "页");
+                    }
+                }).typeset();
+                pages.addAll(chapter.getPages());
+                Timer.typesetterChapterEnd = System.currentTimeMillis();
+                MyLog.print(this.getClass(), this.getClass().getName() + " 排版耗时:" + (Timer.typesetterChapterEnd - Timer.typesetterChapterStart));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public LinkedList<IPage> getPages(){
+        return pages;
+    }
+
+    public IProgress getProgress() {
+        IProgress progress = null;
+        try {
+            progress = this.iProgressData.getProgress(this.userId, this.ePub.getBookId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return progress;
+    }
+
+    public void saveProgress(Progress progress) throws Exception {
+        iProgressData.saveProgress(progress);
     }
 
     public interface OnEPubManageListener {

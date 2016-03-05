@@ -12,6 +12,7 @@ public class EPubRenderConfigure {
     private int paragraphOffset;
     private int sectionOffset;
     private int metaOffset;
+    private int pageIndex;
 
     public EPubRenderConfigure() {
         super();
@@ -61,5 +62,13 @@ public class EPubRenderConfigure {
 
     public void setMetaOffset(int metaOffset) {
         this.metaOffset = metaOffset;
+    }
+
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
     }
 }

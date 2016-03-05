@@ -11,10 +11,23 @@ import org.maxwe.epub.android.lib.model.EPub;
  * Description: @TODO
  */
 public class ReaderActivity extends AppCompatActivity {
-
+    private EPubContainer ePubContainer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(new EPubContainer(this, new EPub("test","/sdcard/YMEPub/sample.zip")));
+        this.ePubContainer = new EPubContainer(this,"dingpw", new EPub("test","/sdcard/YMEPub/sample.zip"));
+        this.setContentView(this.ePubContainer);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.ePubContainer != null){
+            try {
+                this.ePubContainer.onBackPressed();
+                this.finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

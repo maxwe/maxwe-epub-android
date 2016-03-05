@@ -7,13 +7,14 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.maxwe.epub.android.lib.core.model.IBook;
+import org.maxwe.epub.android.lib.core.model.IProgress;
 import org.maxwe.epub.android.lib.core.view.IEPubContainer;
+import org.maxwe.epub.android.lib.data.ProgressData;
 import org.maxwe.epub.android.lib.model.EPub;
+import org.maxwe.epub.android.lib.model.Progress;
 import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.android.lib.util.Timer;
-import org.maxwe.epub.typesetter.core.IChapter;
 import org.maxwe.epub.typesetter.core.IPage;
-import org.maxwe.epub.typesetter.impl.Chapter;
 
 import java.util.LinkedList;
 
@@ -22,7 +23,7 @@ import java.util.LinkedList;
  * Email: www.dingpengwei@foxmail.com www.dingpegnwei@gmail.com
  * Description: EPub容器
  */
-public class EPubContainer extends RelativeLayout implements IEPubContainer {
+public class EPubContainer extends RelativeLayout implements IEPubContainer ,EPubManager.OnEPubManageListener{
 
     private Handler handler = new Handler() {
         @Override
@@ -36,83 +37,67 @@ public class EPubContainer extends RelativeLayout implements IEPubContainer {
         }
     };
 
-    private EPubManager.OnEPubManageListener ePubManageListener = new EPubManager.OnEPubManageListener() {
-        @Override
-        public void onBookNotExists(IBook ePub) {
-            Message message = new Message();
-            message.what = HANDLER_KEY_EPUB_MANAGER_FAIL;
-            handler.sendMessage(message);
-        }
-
-        @Override
-        public void onUnzipEPubError(IBook ePub, Exception exception) {
-            Message message = new Message();
-            message.what = HANDLER_KEY_EPUB_MANAGER_FAIL;
-            handler.sendMessage(message);
-        }
-
-        @Override
-        public void onTableContentFail(IBook ePub) {
-            Message message = new Message();
-            message.what = HANDLER_KEY_EPUB_MANAGER_FAIL;
-            handler.sendMessage(message);
-        }
-
-        @Override
-        public void onSuccess(IBook ePub) {
-            Message message = new Message();
-            message.what = HANDLER_KEY_EPUB_MANAGER_SUCCESS;
-            handler.sendMessage(message);
-        }
-    };
-
+    private String userId;
     private EPubManager ePubManager;
+    private EPubRender ePubRender;
 
-    public EPubContainer(final Context context, final EPub ePub) {
+    public EPubContainer(final Context context,final String userId, final EPub ePub) {
         super(context);
+        this.userId = userId;
         MyLog.addLogAccess(this.getClass());
         Timer.initEPubContainerStart = System.currentTimeMillis();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                test();
-                ePubManager = new EPubManager(context, ePub, ePubManageListener);
-                ePubManager.manage();
+                ePubManager = new EPubManager(userId, ePub, EPubContainer.this);
+                ePubManager.configure();
             }
         }).start();
     }
 
     private void initView() {
-        this.addView(new EPubRender(this.getContext(), this.ePubManager.getEPub(), null, this.pages));
+        this.ePubRender = new EPubRender(this.getContext(), this.ePubManager.getEPub(), this.ePubManager.getProgress(), this.ePubManager.getPages());
+        this.addView(ePubRender);
         Timer.initEPubContainerEnd = System.currentTimeMillis();
         MyLog.print(this.getClass(), this.getClass().getName() + "初始化完成" + (Timer.initEPubContainerEnd - Timer.initEPubContainerStart));
     }
 
-    private LinkedList<IPage> pages;
+    @Override
+    public void onBookNotExists(IBook ePub) {
+        Message message = new Message();
+        message.what = HANDLER_KEY_EPUB_MANAGER_FAIL;
+        this.handler.sendMessage(message);
+    }
 
-    private void test() {
-        try {
-            Timer.typesetterChapterStart = System.currentTimeMillis();
-            String path = "/sdcard/YMEPub/YMEPub/sample/OEBPS/Text/ds00216105.xhtml";
-            org.maxwe.epub.parser.core.IChapter parserChapter = new org.maxwe.epub.parser.impl.Chapter(path);
-            IChapter chapter = new Chapter(parserChapter, 100, 100, 1440 - 100, 2304 - 100).setChapterTypesetListener(new Chapter.ChapterTypesetListener() {
-                public void onChapterTypesetStart(IChapter chapter) {
-                    //System.out.println("章节：《" + chapter.getChapterName() + "》排版开始");
-                }
+    @Override
+    public void onUnzipEPubError(IBook ePub, Exception exception) {
+        Message message = new Message();
+        message.what = HANDLER_KEY_EPUB_MANAGER_FAIL;
+        this.handler.sendMessage(message);
+    }
 
-                public void onPageTypesetOver(IChapter chapter, int indexInChapter) {
-                    //System.out.println("章节：《" + chapter.getChapterName() + "》排版到第" + indexInChapter + "页");
-                }
+    @Override
+    public void onTableContentFail(IBook ePub) {
+        Message message = new Message();
+        message.what = HANDLER_KEY_EPUB_MANAGER_FAIL;
+        this.handler.sendMessage(message);
+    }
 
-                public void onChapterTypesetEnd(IChapter chapter) {
-                    //System.out.println("章节：《" + chapter.getChapterName() + "》排版结束，共有" + chapter.getPages().size() + "页");
-                }
-            }).typeset();
-            this.pages = chapter.getPages();
-            Timer.typesetterChapterEnd = System.currentTimeMillis();
-            MyLog.print(this.getClass(), this.getClass().getName() + " 排版耗时:" + (Timer.typesetterChapterStart - Timer.typesetterChapterEnd));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onSuccess(IBook ePub) {
+        Message message = new Message();
+        message.what = HANDLER_KEY_EPUB_MANAGER_SUCCESS;
+        this.handler.sendMessage(message);
+    }
+
+    @Override
+    public void onBackPressed() throws Exception {
+//        Progress progress = (Progress)this.ePubManager.getProgress();
+//        IPage page = this.ePubRender.getPage();
+//        progress.setChapterOffset(page.getChapterIndex());
+//        progress.setParagraphOffset(page.getStartParagraphIndexInChapter());
+//        progress.setSectionOffset(page.getStartSectionIndexInParagraph());
+//        progress.setMetaOffset(page.getStartMetaIndexInSection());
+//        this.ePubManager.saveProgress(progress);
     }
 }

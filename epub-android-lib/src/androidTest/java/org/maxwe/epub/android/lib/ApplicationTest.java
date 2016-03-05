@@ -20,11 +20,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
             }
 
             @Override
-            public void onMakeEPubDirFail(IBook ePub) {
-                System.out.println();
-            }
-
-            @Override
             public void onUnzipEPubError(IBook ePub, Exception exception) {
                 System.out.println();
             }

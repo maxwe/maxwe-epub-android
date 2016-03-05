@@ -6,9 +6,10 @@ package org.maxwe.epub.android.lib.core.model;
  * Description: 阅读进度接口规范
  */
 public interface IProgress {
-    String getBookId();
 
     String getUserId();
+
+    String getBookId();
 
     int getChapterOffset();
 

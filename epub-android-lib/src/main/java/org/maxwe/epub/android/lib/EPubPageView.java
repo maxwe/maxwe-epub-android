@@ -17,6 +17,7 @@ public class EPubPageView extends FrameLayout {
     private int pageIndex;
     private String pageName;
     private Paint paint = new Paint();
+    private Page page;
 
     public EPubPageView(Context context, String pageName) {
         super(context);
@@ -41,7 +42,12 @@ public class EPubPageView extends FrameLayout {
     }
 
     public void drawPage(Page page) {
+        this.page = page;
         this.removeAllViews();
         this.addView(new PageDrawer(this.getContext(), page));
+    }
+
+    public Page getPage() {
+        return page;
     }
 }
