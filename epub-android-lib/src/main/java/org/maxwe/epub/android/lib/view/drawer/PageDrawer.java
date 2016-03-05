@@ -2,6 +2,7 @@ package org.maxwe.epub.android.lib.view.drawer;
 
 import android.content.Context;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import org.maxwe.epub.typesetter.core.IParagraph;
 import org.maxwe.epub.typesetter.core.ISection;
@@ -34,7 +35,7 @@ public class PageDrawer extends FrameLayout {
                 if (section instanceof TextSection) {
                     this.textSections.add((TextSection)section);
                 } else if (section instanceof ImageSection) {
-
+                    this.imageSections.add((ImageSection)section);
                 } else if (section instanceof AudioSection) {
 
                 } else if (section instanceof VideoSection) {
@@ -48,7 +49,7 @@ public class PageDrawer extends FrameLayout {
         }
 
         if (!this.imageSections.isEmpty()) {
-
+            this.addView(new ImageDrawer(this.getContext(),this.imageSections));
         }
 
         if (!this.audioSections.isEmpty()) {
