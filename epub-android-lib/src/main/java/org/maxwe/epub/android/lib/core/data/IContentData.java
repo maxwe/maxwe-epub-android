@@ -1,8 +1,5 @@
 package org.maxwe.epub.android.lib.core.data;
 
-import android.content.Context;
-
-import org.maxwe.epub.android.lib.core.model.IBook;
 import org.maxwe.epub.android.lib.core.model.IContent;
 
 import java.util.List;
@@ -18,4 +15,5 @@ public interface IContentData<E extends IContent> {
     List<E> saveContents(List<E> es) throws Exception;
     List<E> updateContents(List<E> es) throws Exception;
     List<E> deleteContentsByBookId(String bookId) throws Exception;
+    E getContent(String bookId,int index) throws Exception;
 }

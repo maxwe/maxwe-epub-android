@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import org.maxwe.epub.typesetter.core.IMeta;
-import org.maxwe.epub.typesetter.impl.ImageSection;
+import org.maxwe.epub.typesetter.impl.dev.ImageSection;
 
 import java.util.LinkedList;
 

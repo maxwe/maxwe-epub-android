@@ -1,6 +1,6 @@
 package org.maxwe.epub.android.lib.core.data;
 
-import org.maxwe.epub.android.lib.core.model.IProgress;
+import org.maxwe.epub.android.lib.core.model.AConfigure;
 
 /**
  * Created by Pengwei Ding on 2016-03-04 16:04.
@@ -16,12 +16,12 @@ public interface IProgressData {
      * @return
      * @throws Exception
      */
-    IProgress getProgress(String userId,String bookId) throws Exception;
+    AConfigure getProgress(String userId,String bookId) throws Exception;
 
     /**
      * 保存图书阅读进度
      * @param progress
      * @throws Exception
      */
-    void saveProgress(IProgress progress) throws Exception;
+    void saveProgress(AConfigure progress) throws Exception;
 }

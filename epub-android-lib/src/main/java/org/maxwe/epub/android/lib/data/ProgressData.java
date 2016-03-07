@@ -1,7 +1,7 @@
 package org.maxwe.epub.android.lib.data;
 
 import org.maxwe.epub.android.lib.core.data.IProgressData;
-import org.maxwe.epub.android.lib.core.model.IProgress;
+import org.maxwe.epub.android.lib.core.model.AConfigure;
 import org.maxwe.epub.android.lib.model.Progress;
 import org.xutils.DbManager;
 
@@ -13,7 +13,7 @@ import org.xutils.DbManager;
 public class ProgressData implements IProgressData {
 
     @Override
-    public IProgress getProgress(String userId, String bookId) throws Exception {
+    public AConfigure getProgress(String userId, String bookId) throws Exception {
         DbManager db = Data.getDB();
         Progress progressHistory = db.selector(Progress.class).where("userId", "is", userId).and("bookId", "is", bookId).findFirst();
         if (progressHistory == null){
@@ -24,7 +24,7 @@ public class ProgressData implements IProgressData {
     }
 
     @Override
-    public void saveProgress(IProgress progress) throws Exception {
+    public void saveProgress(AConfigure progress) throws Exception {
         DbManager db = Data.getDB();
         db.update(progress,"chapterOffset","paragraphOffset","sectionOffset","metaOffset");
     }

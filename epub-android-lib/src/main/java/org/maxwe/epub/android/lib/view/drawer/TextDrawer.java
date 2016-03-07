@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.widget.TextView;
 
 import org.maxwe.epub.typesetter.core.IMeta;
-import org.maxwe.epub.typesetter.impl.TextSection;
+import org.maxwe.epub.typesetter.impl.dev.TextSection;
 
 import java.util.LinkedList;
 

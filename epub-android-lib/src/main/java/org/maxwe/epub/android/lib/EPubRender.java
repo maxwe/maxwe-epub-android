@@ -4,15 +4,15 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import org.maxwe.epub.android.lib.core.model.IProgress;
+import org.maxwe.epub.android.lib.core.model.AConfigure;
 import org.maxwe.epub.android.lib.model.EPub;
 import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.typesetter.core.IPage;
-import org.maxwe.epub.typesetter.impl.Page;
 
 import java.util.LinkedList;
 
@@ -32,7 +32,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
      */
     private int screenHeight;
 
-    private int currentPageNum = 0;
+    private int currentPageNum = Integer.MAX_VALUE / 2;
 
     /**
      * 定义三张页面
@@ -102,7 +102,7 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
 
         @Override
         public void onPageSelected(int i) {
-            System.out.println("onPageSelected: " + i);
+            System.out.println("onPageSelected: param = " + i + " , current = " + currentPageNum);
             if (i > currentPageNum) {
                 /**
                  * 向右翻页
@@ -110,7 +110,8 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                 currentPageNum++;
                 System.out.println("向右翻页 ======== 当前页码：" + i + " = " + currentPageNum + " next= " + (pageViews.get(Math.abs(i) % 3).getPageIndex() + 1));
                 pageViews.get(Math.abs(i + 1) % 3).setPageIndex(pageViews.get(Math.abs(i) % 3).getPageIndex() + 1);
-                pageViews.get(Math.abs(i + 1) % 3).drawPage((Page) pages.get(pageViews.get(Math.abs(i + 1) % 3).getPageIndex() >= pages.size() ? pages.size() - 1 : pageViews.get(Math.abs(i + 1) % 3).getPageIndex()));
+                //pageViews.get(Math.abs(i + 1) % 3).drawPage(ePubManager.getPage(EPubManager.PageScrolledStatus.next).get(0));
+//                pageViews.get(Math.abs(i + 1) % 3).drawPage((Page) pages.get(pageViews.get(Math.abs(i + 1) % 3).getPageIndex() >= pages.size() ? pages.size() - 1 : pageViews.get(Math.abs(i + 1) % 3).getPageIndex()));
             } else {
                 /**
                  * 向左翻页
@@ -124,7 +125,8 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
                     pageViews.get(1).setPageIndex(1);
                     pageViews.get(2).setPageIndex(2);
                 }
-                pageViews.get(Math.abs(i - 1) % 3).drawPage((Page) pages.get(pageViews.get(Math.abs(i - 1) % 3).getPageIndex() >= pages.size() ? pages.size() - 1 : pageViews.get(Math.abs(i - 1) % 3).getPageIndex()));
+                //pageViews.get(Math.abs(i - 1) % 3).drawPage(ePubManager.getPage(EPubManager.PageScrolledStatus.next).get(0));
+//                pageViews.get(Math.abs(i - 1) % 3).drawPage((Page) pages.get(pageViews.get(Math.abs(i - 1) % 3).getPageIndex() >= pages.size() ? pages.size() - 1 : pageViews.get(Math.abs(i - 1) % 3).getPageIndex()));
             }
         }
 
@@ -134,25 +136,10 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         }
     };
 
-    private EPub ePub;
-    private IProgress progress;
-
-    public EPubRender(Context context, EPub ePub, IProgress progress, LinkedList<IPage> pages) {
+    private EPubManager ePubManager;
+    public EPubRender(Context context, EPub ePub, AConfigure progress) {
         super(context);
         MyLog.addLogAccess(this.getClass());
-        this.ePub = ePub;
-        this.pages = pages;
-        this.progress = progress;
-//        for (int index= 0;index<this.pages.size();index++){
-//            IPage iPage = this.pages.get(index);
-//            if (this.progress.getChapterOffset() == iPage.getChapterIndex() &&
-//                    this.progress.getParagraphOffset() == iPage.getStartParagraphIndexInChapter() &&
-//                    this.progress.getSectionOffset() == iPage.getStartSectionIndexInParagraph() &&
-//                    this.progress.getMetaOffset() == iPage.getStartMetaIndexInSection()){
-//                this.currentPageNum = index;
-//                break;
-//            }
-//        }
         this.initView();
     }
 
@@ -170,6 +157,10 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         this.secondPageView = new EPubPageView(this.getContext(), "第二页").setPageIndex(1);
         this.thirdPageView = new EPubPageView(this.getContext(), "第三页").setPageIndex(2);
 
+        this.firstPageView.setBackgroundColor(Color.RED);
+        this.secondPageView.setBackgroundColor(Color.GREEN);
+        this.thirdPageView.setBackgroundColor(Color.BLUE);
+
         /**
          * 初始化页面集合
          */
@@ -180,23 +171,46 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         this.firstPageView.setOnLongClickListener(this);
         this.secondPageView.setOnLongClickListener(this);
         this.thirdPageView.setOnLongClickListener(this);
-
-        this.setOnPageChangeListener(this.onPageChangeListener);
         this.setAdapter(this.pagerAdapter);
-        this.setCurrentItem(this.currentPageNum);
-
-
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        int action = ev.getAction();
+        switch (action){
+            case MotionEvent.ACTION_DOWN:
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                break;
+        }
+        return super.onTouchEvent(ev);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        this.clearOnPageChangeListeners();
+        this.addOnPageChangeListener(this.onPageChangeListener);
+        this.setCurrentItem(this.currentPageNum);
+        System.out.println("onAttachedToWindow");
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        this.clearOnPageChangeListeners();
+        System.out.println("onDetachedFromWindow");
+    }
+
 
     @Override
     public boolean onLongClick(View v) {
         return false;
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-    }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -206,20 +220,10 @@ public class EPubRender extends ViewPager implements View.OnLongClickListener {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    private LinkedList<IPage> pages = new LinkedList<>();
-
-    public void setPages(LinkedList<IPage> pages) {
-        this.pages = pages;
-    }
-
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         MyLog.print(this.getClass(), this.getClass().getName() + " onLayout " + changed);
-        if (changed) {
-            this.firstPageView.drawPage((Page) pages.get(0));
-            this.secondPageView.drawPage((Page) pages.get(1));
-        }
     }
 
     IPage getPage(){

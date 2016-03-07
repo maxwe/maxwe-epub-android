@@ -3,8 +3,8 @@ package org.maxwe.epub.android.lib;
 import org.maxwe.epub.android.lib.core.data.IBookData;
 import org.maxwe.epub.android.lib.core.data.IContentData;
 import org.maxwe.epub.android.lib.core.data.IProgressData;
+import org.maxwe.epub.android.lib.core.model.AConfigure;
 import org.maxwe.epub.android.lib.core.model.IBook;
-import org.maxwe.epub.android.lib.core.model.IProgress;
 import org.maxwe.epub.android.lib.data.ContentData;
 import org.maxwe.epub.android.lib.data.EPubData;
 import org.maxwe.epub.android.lib.data.ProgressData;
@@ -16,10 +16,6 @@ import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.android.lib.util.Timer;
 import org.maxwe.epub.parser.EPubParser;
 import org.maxwe.epub.parser.core.INavigation;
-import org.maxwe.epub.typesetter.Configure;
-import org.maxwe.epub.typesetter.core.IChapter;
-import org.maxwe.epub.typesetter.core.IPage;
-import org.maxwe.epub.typesetter.impl.Chapter;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -82,7 +78,7 @@ public class EPubManager {
             return this;
         }
 
-        IBook bookById = null;
+        IBook bookById;
         try {
             bookById = this.iBookData.findBookById(this.ePub.getBookId());
             if (bookById != null) {
@@ -150,10 +146,8 @@ public class EPubManager {
             }
         }
         Timer.configureEnd = System.currentTimeMillis();
-        MyLog.print(this.getClass(),"图书配置结束：" + (Timer.configureEnd - Timer.configureStart));
+        MyLog.print(this.getClass(), "图书配置结束：" + (Timer.configureEnd - Timer.configureStart));
 
-
-        this.buildPages();
         this.onEPubManageListener.onSuccess(this.ePub);
         return this;
     }
@@ -201,7 +195,7 @@ public class EPubManager {
         Timer.unzipStart = System.currentTimeMillis();
         FileUtils.unzip(ePub.getBookPath(), targetDirPath);
         Timer.unzipEnd = System.currentTimeMillis();
-        MyLog.print(this.getClass(),this.getClass().getName() + "解压图书耗时：" + (Timer.unzipEnd - Timer.unzipStart));
+        MyLog.print(this.getClass(), this.getClass().getName() + "解压图书耗时：" + (Timer.unzipEnd - Timer.unzipStart));
         ePub.setBookDir(targetDirPath);
         ePub.setIsUnziped(true);
         return ePub;
@@ -235,45 +229,9 @@ public class EPubManager {
         return (EPub) this.ePub;
     }
 
-    LinkedList<IPage> pages = new LinkedList<>();
 
-    private void buildPages(){
-        pages.clear();
-        List<Content> contents = this.getContent();
-        for (int index=0;index<contents.size();index++){
-            Content content = contents.get(index);
-            try {
-                Timer.typesetterChapterStart = System.currentTimeMillis();
-                String path = content.getUrl();
-                org.maxwe.epub.parser.core.IChapter parserChapter = new org.maxwe.epub.parser.impl.Chapter(path,index);
-                Configure configure = new Configure(0, 0, 0, 0);
-                IChapter chapter = new Chapter(parserChapter,configure, 100, 100, 1440 - 100, 2304 - 100).setChapterTypesetListener(new Chapter.ChapterTypesetListener() {
-                    public void onChapterTypesetStart(IChapter chapter) {
-//                        System.out.println("章节：《" + chapter.getChapterName() + "》排版开始");
-                    }
-
-                    public void onPageTypesetOver(IChapter chapter, int indexInChapter) {
-//                        System.out.println("章节：《" + chapter.getChapterName() + "》排版到第" + indexInChapter + "页");
-                    }
-
-                    public void onChapterTypesetEnd(IChapter chapter) {
-//                        System.out.println("章节：《" + chapter.getChapterName() + "》排版结束，共有" + chapter.getPages().size() + "页");
-                    }
-                }).typeset();
-                pages.addAll(chapter.getPages());
-                Timer.typesetterChapterEnd = System.currentTimeMillis();
-                MyLog.print(this.getClass(), this.getClass().getName() + " 排版耗时:" + (Timer.typesetterChapterEnd - Timer.typesetterChapterStart));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    public LinkedList<IPage> getPages(){
-        return pages;
-    }
-
-    public IProgress getProgress() {
-        IProgress progress = null;
+    public AConfigure getProgress() {
+        AConfigure progress = null;
         try {
             progress = this.iProgressData.getProgress(this.userId, this.ePub.getBookId());
         } catch (Exception e) {
@@ -284,6 +242,10 @@ public class EPubManager {
 
     public void saveProgress(Progress progress) throws Exception {
         iProgressData.saveProgress(progress);
+    }
+
+    public enum PageScrolledStatus {
+        previous, current, next;
     }
 
     public interface OnEPubManageListener {

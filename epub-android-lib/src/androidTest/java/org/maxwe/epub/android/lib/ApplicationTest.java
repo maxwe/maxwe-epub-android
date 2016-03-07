@@ -12,28 +12,5 @@ import org.maxwe.epub.android.lib.model.EPub;
 public class ApplicationTest extends ApplicationTestCase<Application> {
     public ApplicationTest() {
         super(Application.class);
-
-        EPubManager ePubManager = new EPubManager(this.getApplication().getApplicationContext(), new EPub("test", "/sdcard/YMEPub/sample.zip"), new EPubManager.OnEPubManageListener() {
-            @Override
-            public void onBookNotExists(IBook ePub) {
-                System.out.println();
-            }
-
-            @Override
-            public void onUnzipEPubError(IBook ePub, Exception exception) {
-                System.out.println();
-            }
-
-            @Override
-            public void onTableContentFail(IBook ePub) {
-
-            }
-
-            @Override
-            public void onSuccess(IBook ePub) {
-                System.out.println();
-            }
-        });
-
     }
 }

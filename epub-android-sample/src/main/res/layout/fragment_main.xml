@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.maxwe.epub.android.lib.sample.MainActivityFragment"
-    tools:showIn="@layout/org_maxwe_activity_main">
+    tools:showIn="@layout/org_maxwe_activity_index">
 
     <Button
         android:id="@+id/open"

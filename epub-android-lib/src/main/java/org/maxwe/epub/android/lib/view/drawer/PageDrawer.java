@@ -2,15 +2,14 @@ package org.maxwe.epub.android.lib.view.drawer;
 
 import android.content.Context;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import org.maxwe.epub.typesetter.core.IParagraph;
 import org.maxwe.epub.typesetter.core.ISection;
-import org.maxwe.epub.typesetter.impl.AudioSection;
-import org.maxwe.epub.typesetter.impl.ImageSection;
-import org.maxwe.epub.typesetter.impl.Page;
-import org.maxwe.epub.typesetter.impl.TextSection;
-import org.maxwe.epub.typesetter.impl.VideoSection;
+import org.maxwe.epub.typesetter.impl.dev.AudioSection;
+import org.maxwe.epub.typesetter.impl.dev.ImageSection;
+import org.maxwe.epub.typesetter.impl.dev.Page;
+import org.maxwe.epub.typesetter.impl.dev.TextSection;
+import org.maxwe.epub.typesetter.impl.dev.VideoSection;
 
 import java.util.LinkedList;
 

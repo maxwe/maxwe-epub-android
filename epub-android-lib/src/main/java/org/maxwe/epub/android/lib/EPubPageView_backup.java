@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import org.maxwe.epub.android.lib.view.drawer.PageDrawer;
-import org.maxwe.epub.typesetter.impl.Page;
+import org.maxwe.epub.typesetter.impl.dev.Page;
 
 /**
  * Created by Pengwei Ding on 2016-01-05 17:29.

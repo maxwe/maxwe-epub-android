@@ -3,6 +3,7 @@ package org.maxwe.epub.android.lib.data;
 import android.content.Context;
 
 import org.maxwe.epub.android.lib.core.data.IContentData;
+import org.maxwe.epub.android.lib.core.model.IContent;
 import org.maxwe.epub.android.lib.model.Content;
 import org.xutils.DbManager;
 import org.xutils.db.sqlite.WhereBuilder;
@@ -48,5 +49,10 @@ public class ContentData implements IContentData {
         List<Content> result = db.selector(Content.class).where("bookId", "=", bookId).findAll();
         db.delete(Content.class, WhereBuilder.b("bookId", "=", bookId));
         return result;
+    }
+
+    @Override
+    public IContent getContent(String bookId, int index) throws Exception {
+        return null;
     }
 }

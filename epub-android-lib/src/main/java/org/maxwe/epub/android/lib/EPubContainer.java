@@ -7,16 +7,10 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.maxwe.epub.android.lib.core.model.IBook;
-import org.maxwe.epub.android.lib.core.model.IProgress;
 import org.maxwe.epub.android.lib.core.view.IEPubContainer;
-import org.maxwe.epub.android.lib.data.ProgressData;
 import org.maxwe.epub.android.lib.model.EPub;
-import org.maxwe.epub.android.lib.model.Progress;
 import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.android.lib.util.Timer;
-import org.maxwe.epub.typesetter.core.IPage;
-
-import java.util.LinkedList;
 
 /**
  * Created by Pengwei Ding on 2016-01-05 16:17.
@@ -56,7 +50,7 @@ public class EPubContainer extends RelativeLayout implements IEPubContainer ,EPu
     }
 
     private void initView() {
-        this.ePubRender = new EPubRender(this.getContext(), this.ePubManager.getEPub(), this.ePubManager.getProgress(), this.ePubManager.getPages());
+        this.ePubRender = new EPubRender(this.getContext(), this.ePubManager.getEPub(), this.ePubManager.getProgress());
         this.addView(ePubRender);
         Timer.initEPubContainerEnd = System.currentTimeMillis();
         MyLog.print(this.getClass(), this.getClass().getName() + "初始化完成" + (Timer.initEPubContainerEnd - Timer.initEPubContainerStart));

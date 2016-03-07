@@ -1,6 +1,6 @@
 package org.maxwe.epub.android.lib;
 
-import org.maxwe.epub.android.lib.core.model.IProgress;
+import org.maxwe.epub.android.lib.core.model.AConfigure;
 
 /**
  * Created by Pengwei Ding on 2016-01-05 17:27.
@@ -25,11 +25,11 @@ public class EPubRenderConfigure {
         this.metaOffset = metaOffset;
     }
 
-    public EPubRenderConfigure(IProgress progress) {
-        this.chapterOffset = progress.getChapterOffset();
-        this.paragraphOffset = progress.getParagraphOffset();
-        this.sectionOffset = progress.getSectionOffset();
-        this.metaOffset = progress.getMetaOffset();
+    public EPubRenderConfigure(AConfigure progress) {
+        this.chapterOffset = progress.getChapterIndex();
+        this.paragraphOffset = progress.getParagraphIndex();
+        this.sectionOffset = progress.getSectionIndex();
+        this.metaOffset = progress.getMetaIndex();
     }
 
     public int getChapterOffset() {
