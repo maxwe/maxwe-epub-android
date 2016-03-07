@@ -50,7 +50,7 @@ public class EPubContainer extends RelativeLayout implements IEPubContainer ,EPu
     }
 
     private void initView() {
-        this.ePubRender = new EPubRender(this.getContext(), this.ePubManager.getEPub(), this.ePubManager.getProgress());
+        this.ePubRender = new EPubRender(this.getContext(), this.ePubManager);
         this.addView(ePubRender);
         Timer.initEPubContainerEnd = System.currentTimeMillis();
         MyLog.print(this.getClass(), this.getClass().getName() + "初始化完成" + (Timer.initEPubContainerEnd - Timer.initEPubContainerStart));

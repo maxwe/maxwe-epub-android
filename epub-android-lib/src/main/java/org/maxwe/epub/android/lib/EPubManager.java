@@ -16,6 +16,8 @@ import org.maxwe.epub.android.lib.util.MyLog;
 import org.maxwe.epub.android.lib.util.Timer;
 import org.maxwe.epub.parser.EPubParser;
 import org.maxwe.epub.parser.core.INavigation;
+import org.maxwe.epub.typesetter.core.IPage;
+import org.maxwe.epub.typesetter.impl.dev.TypesetterManager;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -35,6 +37,7 @@ public class EPubManager {
 
     private String userId;
     private IBook ePub;
+    private TypesetterManager typesetterManager;
 
     private OnEPubManageListener onEPubManageListener = new OnEPubManageListener() {
         @Override
@@ -145,9 +148,9 @@ public class EPubManager {
                 }
             }
         }
+        this.typesetterManager = new TypesetterManager(this.ePub.getBookDir(),this.getProgress());
         Timer.configureEnd = System.currentTimeMillis();
         MyLog.print(this.getClass(), "图书配置结束：" + (Timer.configureEnd - Timer.configureStart));
-
         this.onEPubManageListener.onSuccess(this.ePub);
         return this;
     }
@@ -229,6 +232,9 @@ public class EPubManager {
         return (EPub) this.ePub;
     }
 
+    public LinkedList<IPage> getPage(TypesetterManager.PageScrolledStatus flag) {
+        return this.typesetterManager.getPage(flag);
+    }
 
     public AConfigure getProgress() {
         AConfigure progress = null;
@@ -242,10 +248,6 @@ public class EPubManager {
 
     public void saveProgress(Progress progress) throws Exception {
         iProgressData.saveProgress(progress);
-    }
-
-    public enum PageScrolledStatus {
-        previous, current, next;
     }
 
     public interface OnEPubManageListener {
