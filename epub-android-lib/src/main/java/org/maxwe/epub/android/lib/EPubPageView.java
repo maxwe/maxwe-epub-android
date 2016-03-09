@@ -38,13 +38,19 @@ public class EPubPageView extends FrameLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawText("第" + this.pageIndex + "页 ", 50, 50, paint);
+        if(this.page == null){
+            canvas.drawText("第" + this.pageIndex + "页 ", 50, 50, paint);
+        }else{
+            canvas.drawText("第" + this.pageIndex + "页，第" + this.page.getChapterIndex() + "章，" + this.page.getChapterName() , 50, 50, paint);
+        }
     }
 
     public void drawPage(Page page) {
         this.page = page;
         this.removeAllViews();
-        this.addView(new PageDrawer(this.getContext(), page));
+        if (this.page != null){
+            this.addView(new PageDrawer(this.getContext(), page));
+        }
     }
 
     public Page getPage() {
