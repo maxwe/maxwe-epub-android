@@ -15,7 +15,7 @@ public class ReaderActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.ePubContainer = new EPubContainer(this,"dingpw", new EPub("test","/sdcard/YMEPub/sample.zip"));
+        this.ePubContainer = new EPubContainer(this,"dingpw", new EPub("test","/sdcard/YMEPub/sample.epub"));
         this.setContentView(this.ePubContainer);
     }
 
